@@ -1,1 +1,183 @@
+Great. Now paste this entire block into line 1 — all of it. This is the first playable version of Star Dominion:
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Star Dominion</title>
+<style>
+  body{
+    margin:0;
+    background:#050914;
+    color:white;
+    font-family:Arial,sans-serif;
+    text-align:center;
+  }
+  h1{color:#62c8ff;margin-bottom:4px}
+  #stats{
+    background:#111a2b;
+    padding:12px;
+    display:flex;
+    justify-content:space-around;
+    flex-wrap:wrap;
+  }
+  button{
+    background:#1677ff;
+    color:white;
+    border:none;
+    border-radius:8px;
+    padding:10px 14px;
+    margin:5px;
+    font-size:16px;
+  }
+  #galaxy{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+    padding:15px;
+  }
+  .star{
+    min-height:110px;
+    padding:10px;
+    border:1px solid #31547d;
+    border-radius:12px;
+    background:#10182a;
+  }
+  .owned{border:2px solid #38d996}
+  .enemy{border:2px solid #ff5c5c}
+  .unknown{opacity:.65}
+  #message{
+    min-height:50px;
+    padding:12px;
+    color:#ffd86b;
+  }
+</style>
+</head>
+<body>
+<h1>STAR DOMINION</h1>
+<div>Turn-Based Galactic Strategy</div>
+<div id="stats">
+  <span>Turn: <b id="turn">1</b></span>
+  <span>Credits: <b id="credits">500</b></span>
+  <span>Science: <b id="science">0</b></span>
+  <span>Fleet: <b id="fleet">2</b></span>
+</div>
+<div>
+  <button onclick="explore()">Explore</button>
+  <button onclick="buildShip()">Build Ship</button>
+  <button onclick="research()">Research</button>
+  <button onclick="endTurn()">End Turn</button>
+</div>
+<div id="message">Welcome, Commander. Your empire begins at Sol.</div>
+<div id="galaxy"></div>
+<script>
+let turn=1;
+let credits=500;
+let science=0;
+let fleet=2;
+let explored=1;
+const systems=[
+ {name:"Sol",planet:"Earth",status:"owned"},
+ {name:"Vega",planet:"Unknown",status:"unknown"},
+ {name:"Sirius",planet:"Unknown",status:"unknown"},
+ {name:"Altair",planet:"Unknown",status:"unknown"},
+ {name:"Rigel",planet:"Unknown",status:"unknown"},
+ {name:"Draconis",planet:"Unknown",status:"unknown"},
+ {name:"Procyon",planet:"Unknown",status:"unknown"},
+ {name:"Orion",planet:"Unknown",status:"unknown"},
+ {name:"Epsilon",planet:"Unknown",status:"unknown"}
+];
+function drawGalaxy(){
+ const galaxy=document.getElementById("galaxy");
+ galaxy.innerHTML="";
+ systems.forEach((s,i)=>{
+   const d=document.createElement("div");
+   d.className="star "+s.status;
+   if(i>=explored){
+     d.innerHTML="✨<br><b>Unexplored System</b>";
+   }else{
+     d.innerHTML="⭐<br><b>"+s.name+"</b><br>"+s.planet+
+       (s.status==="owned"?"<br>🟢 Your Colony":
+       s.status==="enemy"?"<br>🔴 Alien Empire":"");
+   }
+   galaxy.appendChild(d);
+ });
+}
+function update(){
+ document.getElementById("turn").textContent=turn;
+ document.getElementById("credits").textContent=credits;
+ document.getElementById("science").textContent=science;
+ document.getElementById("fleet").textContent=fleet;
+ drawGalaxy();
+}
+function msg(text){
+ document.getElementById("message").textContent=text;
+}
+function explore(){
+ if(fleet<1){
+   msg("You need a ship to explore.");
+   return;
+ }
+ if(explored>=systems.length){
+   msg("The entire galaxy has been explored.");
+   return;
+ }
+ let s=systems[explored];
+ const roll=Math.random();
+ if(roll<0.25){
+   s.planet="Rich World";
+   s.status="owned";
+   credits+=100;
+   msg("You discovered "+s.name+" — a rich planet joins your empire!");
+ }
+ else if(roll<0.45){
+   s.planet="Alien Civilization";
+   s.status="enemy";
+   msg("Warning! An alien civilization controls "+s.name+".");
+ }
+ else{
+   s.planet="Habitable World";
+   msg("You discovered a habitable planet at "+s.name+".");
+ }
+ explored++;
+ science+=15;
+ update();
+}
+function buildShip(){
+ if(credits<150){
+   msg("Not enough credits to build a ship.");
+   return;
+ }
+ credits-=150;
+ fleet++;
+ msg("A new starship has joined your fleet.");
+ update();
+}
+function research(){
+ if(science<30){
+   msg("You need at least 30 science points.");
+   return;
+ }
+ science-=30;
+ fleet++;
+ msg("New military technology discovered! Fleet strength increased.");
+ update();
+}
+function endTurn(){
+ turn++;
+ credits+=75;
+ science+=10;
+ if(Math.random()<0.20 && explored>2){
+   msg("Sensors detect mysterious movement somewhere in the galaxy...");
+ }else{
+   msg("Turn "+turn+" begins. Your empire continues to grow.");
+ }
+ update();
+}
+drawGalaxy();
+</script>
+</body>
+</html>
+
+After it’s pasted, don’t press anything else yet. Just tell me “pasted” and I’ll walk you through the next single button to press.
