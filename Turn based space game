@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Galactic Dominion</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:#020617;
+  color:white;
+  font-family:Arial,sans-serif;
+  overflow-x:hidden;
+}
+header{
+  padding:18px;
+  text-align:center;
+  background:#07142c;
+  border-bottom:2px solid #38bdf8;
+}
+h1{
+  margin:0;
+  color:#67e8f9;
+  letter-spacing:3px;
+}
+#game{
+  max-width:900px;
+  margin:auto;
+  padding:15px;
+}
+.panel{
+  background:#0f172a;
+  border:1px solid #334155;
+  border-radius:12px;
+  padding:15px;
+  margin-bottom:12px;
+}
+.stats{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:8px;
+}
+.stat{
+  background:#111c33;
+  padding:10px;
+  border-radius:8px;
+}
+button{
+  background:#0369a1;
+  color:white;
+  border:0;
+  padding:12px;
+  margin:5px 3px;
+  border-radius:8px;
+  font-size:15px;
+}
+button:active{
+  background:#0ea5e9;
+}
+.star{
+  display:inline-block;
+  padding:10px;
+  margin:5px;
+  background:#172554;
+  border:1px solid #3b82f6;
+  border-radius:50%;
+  cursor:pointer;
+}
+.enemy{
+  color:#f87171;
+}
+.good{
+  color:#4ade80;
+}
+#log{
+  height:180px;
+  overflow:auto;
+  background:#020617;
+  padding:10px;
+  border-radius:8px;
+  font-size:14px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>GALACTIC DOMINION</h1>
+<div>Explore • Colonize • Research • Conquer</div>
+</header>
+
+<div id="game">
+
+<div class="panel">
+<h2>Empire</h2>
+<div class="stats">
+<div class="stat">Credits: <b id="credits">500</b></div>
+<div class="stat">Research: <b id="research">0</b></div>
+<div class="stat">Fleet Power: <b id="fleet">10</b></div>
+<div class="stat">Colonies: <b id="colonies">1</b></div>
+<div class="stat">Turn: <b id="turn">1</b></div>
+<div class="stat">Technology: <b id="tech">1</b></div>
+</div>
+</div>
+
+<div class="panel">
+<h2>Command</h2>
+<button onclick="explore()">Explore Galaxy</button>
+<button onclick="buildFleet()">Build Warship (100)</button>
+<button onclick="researchTech()">Research Technology (75)</button>
+<button onclick="nextTurn()">Next Turn</button>
+</div>
+
+<div class="panel">
+<h2>Known Galaxy</h2>
+<div id="galaxy">
+<span class="star">☀ Sol</span>
+</div>
+</div>
+
+<div class="panel">
+<h2>Command Log</h2>
+<div id="log">Welcome, Commander. Humanity has reached the stars.</div>
+</div>
+
+</div>
+
+<script>
+let credits=500;
+let research=0;
+let fleet=10;
+let colonies=1;
+let turn=1;
+let tech=1;
+let systems=1;
+
+function update(){
+ document.getElementById("credits").innerText=credits;
+ document.getElementById("research").innerText=research;
+ document.getElementById("fleet").innerText=fleet;
+ document.getElementById("colonies").innerText=colonies;
+ document.getElementById("turn").innerText=turn;
+ document.getElementById("tech").innerText=tech;
+}
+
+function log(text){
+ let box=document.getElementById("log");
+ box.innerHTML="<div>• "+text+"</div>"+box.innerHTML;
+}
+
+function explore(){
+ if(credits<25){
+   log("Not enough credits to launch an exploration mission.");
+   return;
+ }
+
+ credits-=25;
+ systems++;
+
+ let names=[
+ "Orion","Draco","Vega","Altair","Sirius",
+ "Titan","Nova","Epsilon","Centauri","Helios"
+ ];
+
+ let name=names[Math.floor(Math.random()*names.length)]+"-"+systems;
+
+ let roll=Math.random();
+
+ let star=document.createElement("span");
+ star.className="star";
+ star.innerText="✦ "+name;
+ document.getElementById("galaxy").appendChild(star);
+
+ if(roll<0.18){
+   log("WARNING: Ancient Guardian detected near "+name+"!");
+   guardian();
+ }
+ else if(roll<0.45){
+   colonies++;
+   credits+=100;
+   log("Habitable world discovered at "+name+". Colony established!");
+ }
+ else if(roll<0.7){
+   research+=50;
+   log("Ancient ruins discovered at "+name+". Research gained.");
+ }
+ else{
+   credits+=60;
+   log("Mineral-rich system discovered at "+name+".");
+ }
+
+ update();
+}
+
+function guardian(){
+ let guardianPower=30+Math.floor(Math.random()*80);
+
+ if(fleet>=guardianPower){
+   credits+=300;
+   research+=100;
+   log("Your fleet destroyed the Ancient Guardian! Massive technology recovered.");
+ }else{
+   fleet=Math.max(1,Math.floor(fleet/2));
+   log("The Ancient Guardian overwhelmed your fleet. Survivors escaped!");
+ }
+}
+
+function buildFleet(){
+ if(credits<100){
+   log("Not enough credits.");
+   return;
+ }
+ credits-=100;
+ fleet+=10+(tech*2);
+ log("New warship commissioned.");
+ update();
+}
+
+function researchTech(){
+ if(credits<75){
+   log("Not enough credits.");
+   return;
+ }
+ credits-=75;
+ research+=25;
+
+ if(research>=100){
+   research-=100;
+   tech++;
+   fleet+=5;
+   log("TECHNOLOGY BREAKTHROUGH! Technology level increased.");
+ }else{
+   log("Scientists continue their research.");
+ }
+
+ update();
+}
+
+function nextTurn(){
+ turn++;
+ let income=colonies*50;
+ credits+=income;
+
+ if(Math.random()<0.15){
+   let attack=20+Math.floor(Math.random()*50);
+
+   if(fleet>=attack){
+     credits+=100;
+     log("Alien raiders attacked. Your fleet defeated them.");
+   }else{
+     credits=Math.max(0,credits-100);
+     log("Alien raiders struck one of your colonies!");
+   }
+ }else{
+   log("Turn "+turn+": Your colonies produced "+income+" credits.");
+ }
+
+ update();
+}
+
+update();
+</script>
+
+</body>
+</html>
